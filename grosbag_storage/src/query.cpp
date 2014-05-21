@@ -28,10 +28,6 @@
 #include "grosbag/query.h"
 #include "grosbag/bag.h"
 
-#include <boost/foreach.hpp>
-
-#define foreach BOOST_FOREACH
-
 using std::map;
 using std::string;
 using std::vector;
@@ -62,7 +58,7 @@ TopicQuery::TopicQuery(std::string const& topic) {
 TopicQuery::TopicQuery(std::vector<std::string> const& topics) : topics_(topics) { }
 
 bool TopicQuery::operator()(ConnectionInfo const* info) const {
-    foreach(string const& topic, topics_)
+    for(string const& topic : topics_)
         if (topic == info->topic)
             return true;
 
@@ -78,7 +74,7 @@ TypeQuery::TypeQuery(std::string const& type) {
 TypeQuery::TypeQuery(std::vector<std::string> const& types) : types_(types) { }
 
 bool TypeQuery::operator()(ConnectionInfo const* info) const {
-    foreach(string const& type, types_)
+    for(string const& type : types_)
         if (type == info->datatype)
             return true;
 

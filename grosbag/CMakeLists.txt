@@ -9,6 +9,8 @@ catkin_python_setup()
 # Support large bags (>2GB) on 32-bit systems
 add_definitions(-D_FILE_OFFSET_BITS=64)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 catkin_package(

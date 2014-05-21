@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS cpp_common roscpp_serialization roscpp_t
 find_package(Boost REQUIRED COMPONENTS date_time filesystem program_options regex)
 find_package(BZip2 REQUIRED)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES grosbag_storage

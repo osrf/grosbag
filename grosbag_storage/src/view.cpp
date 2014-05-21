@@ -29,11 +29,8 @@
 #include "grosbag/bag.h"
 #include "grosbag/message_instance.h"
 
-#include <boost/foreach.hpp>
 #include <set>
 #include <assert.h>
-
-#define foreach BOOST_FOREACH
 
 using std::map;
 using std::string;
@@ -63,7 +60,7 @@ void View::iterator::populate() {
     assert(view_ != NULL);
 
     iters_.clear();
-    foreach(MessageRange const* range, view_->ranges_)
+    for(MessageRange const* range : view_->ranges_)
         if (range->begin != range->end)
             iters_.push_back(ViewIterHelper(range->begin, range));
 
@@ -75,7 +72,7 @@ void View::iterator::populateSeek(multiset<IndexEntry>::const_iterator iter) {
     assert(view_ != NULL);
 
     iters_.clear();
-    foreach(MessageRange const* range, view_->ranges_) {
+    for(MessageRange const* range : view_->ranges_) {
         multiset<IndexEntry>::const_iterator start = std::lower_bound(range->begin, range->end, iter->time, IndexEntryCompare());
         if (start != range->end)
             iters_.push_back(ViewIterHelper(start, range));
@@ -164,9 +161,9 @@ View::View(Bag const& bag, boost::function<bool(ConnectionInfo const*)> query, r
 }
 
 View::~View() {
-    foreach(MessageRange* range, ranges_)
+    for(MessageRange* range : ranges_)
         delete range;
-    foreach(BagQuery* query, queries_)
+    for(BagQuery* query : queries_)
         delete query;
 }
 
@@ -177,7 +174,7 @@ ros::Time View::getBeginTime()
 
   ros::Time begin = ros::TIME_MAX;
 
-  foreach (grosbag::MessageRange* range, ranges_)
+  for(grosbag::MessageRange* range : ranges_)
   {
     if (range->begin->time < begin)
       begin = range->begin->time;
@@ -192,7 +189,7 @@ ros::Time View::getEndTime()
 
   ros::Time end = ros::TIME_MIN;
 
-  foreach (grosbag::MessageRange* range, ranges_)
+  for(grosbag::MessageRange* range : ranges_)
   {
     std::multiset<IndexEntry>::const_iterator e = range->end;
     e--;
@@ -221,7 +218,7 @@ uint32_t View::size() {
   {
     size_cache_ = 0;
 
-    foreach (MessageRange* range, ranges_)
+    for(MessageRange* range : ranges_)
     {
       size_cache_ += std::distance(range->begin, range->end);
     }
@@ -307,7 +304,7 @@ void View::updateQueries(BagQuery* q) {
 }
 
 void View::update() {
-    foreach(BagQuery* query, queries_) {
+    for(BagQuery* query : queries_) {
         if (query->bag->bag_revision_ != query->bag_revision) {
             updateQueries(query);
             query->bag_revision = query->bag->bag_revision_;
@@ -319,7 +316,7 @@ std::vector<const ConnectionInfo*> View::getConnections()
 {
   std::vector<const ConnectionInfo*> connections;
 
-  foreach(MessageRange* range, ranges_)
+  for(MessageRange* range : ranges_)
   {
     connections.push_back(range->connection_info);
   }

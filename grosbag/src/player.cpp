@@ -40,12 +40,10 @@
   #include <sys/select.h>
 #endif
 
-#include <boost/foreach.hpp>
+#include <algorithm>
 #include <boost/format.hpp>
 
 #include "rosgraph_msgs/Clock.h"
-
-#define foreach BOOST_FOREACH
 
 using std::map;
 using std::pair;
@@ -107,7 +105,7 @@ Player::Player(PlayerOptions const& options) :
 }
 
 Player::~Player() {
-    foreach(shared_ptr<Bag> bag, bags_)
+    for(shared_ptr<Bag> bag : bags_)
         bag->close();
 
     restoreTerminal();
@@ -117,7 +115,7 @@ void Player::publish() {
     options_.check();
 
     // Open all the bag files
-    foreach(string const& filename, options_.bags) {
+    for(string const& filename : options_.bags) {
         ROS_INFO("Opening %s", filename.c_str());
 
         try
@@ -142,7 +140,7 @@ void Player::publish() {
     
     // Publish all messages in the bags
     View full_view;
-    foreach(shared_ptr<Bag> bag, bags_)
+    for(shared_ptr<Bag> bag : bags_)
         full_view.addQuery(*bag);
 
     ros::Time initial_time = full_view.getBeginTime();
@@ -160,10 +158,10 @@ void Player::publish() {
 
     if (options_.topics.empty())
     {
-      foreach(shared_ptr<Bag> bag, bags_)
+      for(shared_ptr<Bag> bag : bags_)
         view.addQuery(*bag, initial_time, finish_time);
     } else {
-      foreach(shared_ptr<Bag> bag, bags_)
+      for(shared_ptr<Bag> bag : bags_)
         view.addQuery(*bag, topics, initial_time, finish_time);
     }
 
@@ -175,7 +173,7 @@ void Player::publish() {
     }
 
     // Advertise all of our messages
-    foreach(const ConnectionInfo* c, view.getConnections())
+    for(const ConnectionInfo* c : view.getConnections())
     {
         ros::M_string::const_iterator header_iter = c->header->find("callerid");
         std::string callerid = (header_iter != c->header->end() ? header_iter->second : string(""));
@@ -226,7 +224,7 @@ void Player::publish() {
         paused_time_ = now_wt;
 
         // Call do-publish for each message
-        foreach(MessageInstance m, view) {
+        for(MessageInstance m : view) {
             if (!node_handle_.ok())
                 break;
 

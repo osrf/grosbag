@@ -48,7 +48,6 @@
 #include <sstream>
 #include <string>
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/thread.hpp>
@@ -61,8 +60,6 @@
 #include "ros/network.h"
 #include "ros/xmlrpc_manager.h"
 #include "XmlRpc.h"
-
-#define foreach BOOST_FOREACH
 
 using std::cout;
 using std::endl;
@@ -154,8 +151,8 @@ int Recorder::run() {
 
     // Subscribe to each topic
     if (!options_.regex) {
-    	foreach(string const& topic, options_.topics)
-			subscribe(topic);
+    	for(string const& topic : options_.topics)
+            subscribe(topic);
     }
 
     if (!ros::Time::waitForValid(ros::WallDuration(2.0)))
@@ -247,7 +244,7 @@ bool Recorder::shouldSubscribeToTopic(std::string const& topic, bool from_node) 
     
     if (options_.regex) {
         // Treat the topics as regular expressions
-        foreach(string const& regex_str, options_.topics) {
+        for(string const& regex_str : options_.topics) {
             boost::regex e(regex_str);
             boost::smatch what;
             if (boost::regex_match(topic, what, e, boost::match_extra))
@@ -255,7 +252,7 @@ bool Recorder::shouldSubscribeToTopic(std::string const& topic, bool from_node) 
         }
     }
     else {
-        foreach(string const& t, options_.topics)
+        for(string const& t : options_.topics)
             if (t == topic)
                 return true;
     }
@@ -536,7 +533,7 @@ void Recorder::doRecordSnapshotter() {
 void Recorder::doCheckMaster(ros::TimerEvent const& e, ros::NodeHandle& node_handle) {
     ros::master::V_TopicInfo topics;
     if (ros::master::getTopics(topics)) {
-		foreach(ros::master::TopicInfo const& t, topics) {
+		for(ros::master::TopicInfo const& t : topics) {
 			if (shouldSubscribeToTopic(t.name))
 				subscribe(t.name);
 		}

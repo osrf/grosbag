@@ -1,7 +1,5 @@
 #include "grosbag/bag_player.h"
 
-#define foreach BOOST_FOREACH
-
 namespace grosbag
 {
 
@@ -43,14 +41,13 @@ ros::Time BagPlayer::real_time(const ros::Time &msg_time) {
 void BagPlayer::start_play() {
 
     std::vector<std::string> topics;
-    std::pair<std::string, BagCallback *> cb;
-    foreach(cb, cbs_)
+    for(std::pair<std::string, BagCallback *> cb : cbs_)
         topics.push_back(cb.first);
 
     View view(bag, TopicQuery(topics), bag_start_, bag_end_);
     play_start_ = ros::Time::now();
 
-    foreach(MessageInstance const m, view)
+    for(MessageInstance const m : view)
     {
         if (cbs_.find(m.getTopic()) == cbs_.end())
             continue;
