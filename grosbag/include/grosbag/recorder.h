@@ -45,9 +45,9 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <condition_variable>
+#include <mutex>
 
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/regex.hpp>
 
 #include <ros/ros.h>
@@ -161,8 +161,8 @@ private:
 
     int                           exit_code_;            //!< eventual exit code
 
-    boost::condition_variable_any queue_condition_;      //!< conditional variable for queue
-    boost::mutex                  queue_mutex_;          //!< mutex for queue
+    std::condition_variable_any   queue_condition_;      //!< conditional variable for queue
+    std::mutex                    queue_mutex_;          //!< mutex for queue
     std::queue<OutgoingMessage>*  queue_;                //!< queue for storing
     uint64_t                      queue_size_;           //!< queue size
     uint64_t                      max_queue_size_;       //!< max queue size
@@ -176,7 +176,7 @@ private:
     ros::Time                     start_time_;
 
     bool                          writing_enabled_;
-    boost::mutex                  check_disk_mutex_;
+    std::mutex                    check_disk_mutex_;
     ros::WallTime                 check_disk_next_;
     ros::WallTime                 warn_next_;
 };

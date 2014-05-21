@@ -51,7 +51,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <boost/thread/xtime.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 
 #include <ros/ros.h>
@@ -291,7 +290,7 @@ void Recorder::doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>&
     OutgoingMessage out(topic, msg_event.getMessage(), connection_header_ptr, rectime);
     
     {
-        boost::mutex::scoped_lock lock(queue_mutex_);
+        std::lock_guard<std::mutex> lock(queue_mutex_);
 
         queue_->push(out);
         queue_size_ += out.msg->size();
@@ -363,7 +362,7 @@ void Recorder::snapshotTrigger(std_msgs::Empty::ConstPtr trigger) {
     ROS_INFO("Triggered snapshot recording with name %s.", target_filename_.c_str());
     
     {
-        boost::mutex::scoped_lock lock(queue_mutex_);
+        std::lock_guard<std::mutex> lock(queue_mutex_);
         queue_queue_.push(OutgoingQueue(target_filename_, queue_, Time::now()));
         queue_      = new std::queue<OutgoingMessage>;
         queue_size_ = 0;
@@ -454,7 +453,7 @@ void Recorder::doRecord() {
     // it shouldn't be in contention.
     ros::NodeHandle nh;
     while (nh.ok() || !queue_->empty()) {
-        boost::unique_lock<boost::mutex> lock(queue_mutex_);
+        std::unique_lock<std::mutex> lock(queue_mutex_);
 
         bool finished = false;
         while (queue_->empty()) {
@@ -463,14 +462,7 @@ void Recorder::doRecord() {
                 finished = true;
                 break;
             }
-            boost::xtime xt;
-#if BOOST_VERSION >= 105000
-            boost::xtime_get(&xt, boost::TIME_UTC_);
-#else
-            boost::xtime_get(&xt, boost::TIME_UTC);
-#endif
-            xt.nsec += 250000000;
-            queue_condition_.timed_wait(lock, xt);
+            queue_condition_.wait_for(lock, std::chrono::milliseconds(250));
             if (checkDuration(ros::Time::now()))
             {
                 finished = true;
@@ -503,7 +495,7 @@ void Recorder::doRecordSnapshotter() {
     ros::NodeHandle nh;
   
     while (nh.ok() || !queue_queue_.empty()) {
-        boost::unique_lock<boost::mutex> lock(queue_mutex_);
+        std::unique_lock<std::mutex> lock(queue_mutex_);
         while (queue_queue_.empty()) {
             if (!nh.ok())
                 return;
@@ -596,7 +588,7 @@ void Recorder::doTrigger() {
 }
 
 bool Recorder::scheduledCheckDisk() {
-    boost::mutex::scoped_lock lock(check_disk_mutex_);
+    std::lock_guard<std::mutex> lock(check_disk_mutex_);
 
     if (ros::WallTime::now() < check_disk_next_)
         return true;
