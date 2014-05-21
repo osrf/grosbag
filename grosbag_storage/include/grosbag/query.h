@@ -40,8 +40,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <functional>
 
-#include <boost/function.hpp>
 #include "grosbag/macros.h"
 #include "grosbag/structures.h"
 
@@ -57,17 +57,17 @@ public:
      * param start_time the beginning of the time_range for the query
      * param end_time   the end of the time_range for the query
      */
-    Query(boost::function<bool(ConnectionInfo const*)>& query,
+    Query(std::function<bool(ConnectionInfo const*)>& query,
     	  ros::Time const& start_time = ros::TIME_MIN,
           ros::Time const& end_time   = ros::TIME_MAX);
 
-    boost::function<bool(ConnectionInfo const*)> const& getQuery() const;  //!< Get the query functor
+    std::function<bool(ConnectionInfo const*)> const& getQuery() const;  //!< Get the query functor
 
     ros::Time const& getStartTime() const; //!< Get the start-time
     ros::Time const& getEndTime()   const; //!< Get the end-time
 
 private:
-    boost::function<bool(ConnectionInfo const*)> query_;
+    std::function<bool(ConnectionInfo const*)> query_;
     ros::Time start_time_;
     ros::Time end_time_;
 };

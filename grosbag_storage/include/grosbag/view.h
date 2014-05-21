@@ -35,7 +35,8 @@
 #ifndef GROSBAG_VIEW_H
 #define GROSBAG_VIEW_H
 
-#include <boost/function.hpp>
+#include <functional>
+
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "grosbag/message_instance.h"
@@ -118,7 +119,7 @@ public:
      * param end_time        The end of the time range for the query
      * param reduce_overlap  If multiple views return the same messages, reduce them to a single message
      */
-    View(Bag const& bag, boost::function<bool(ConnectionInfo const*)> query,
+    View(Bag const& bag, std::function<bool(ConnectionInfo const*)> query,
          ros::Time const& start_time = ros::TIME_MIN, ros::Time const& end_time = ros::TIME_MAX, bool const& reduce_overlap = false);
 
     ~View();
@@ -142,7 +143,7 @@ public:
      * param start_time The beginning of the time range for the query
      * param end_time   The end of the time range for the query
      */
-    void addQuery(Bag const& bag, boost::function<bool(ConnectionInfo const*)> query,
+    void addQuery(Bag const& bag, std::function<bool(ConnectionInfo const*)> query,
     		      ros::Time const& start_time = ros::TIME_MIN, ros::Time const& end_time = ros::TIME_MAX);
 
     std::vector<const ConnectionInfo*> getConnections();

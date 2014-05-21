@@ -37,12 +37,12 @@ namespace grosbag {
 
 // Query
 
-Query::Query(boost::function<bool(ConnectionInfo const*)>& query, ros::Time const& start_time, ros::Time const& end_time)
+Query::Query(std::function<bool(ConnectionInfo const*)>& query, ros::Time const& start_time, ros::Time const& end_time)
 	: query_(query), start_time_(start_time), end_time_(end_time)
 {
 }
 
-boost::function<bool(ConnectionInfo const*)> const& Query::getQuery() const {
+std::function<bool(ConnectionInfo const*)> const& Query::getQuery() const {
 	return query_;
 }
 

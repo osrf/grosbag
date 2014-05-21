@@ -156,7 +156,7 @@ View::View(Bag const& bag, ros::Time const& start_time, ros::Time const& end_tim
 	addQuery(bag, start_time, end_time);
 }
 
-View::View(Bag const& bag, boost::function<bool(ConnectionInfo const*)> query, ros::Time const& start_time, ros::Time const& end_time, bool const& reduce_overlap) : view_revision_(0), size_cache_(0), size_revision_(0), reduce_overlap_(reduce_overlap) {
+View::View(Bag const& bag, std::function<bool(ConnectionInfo const*)> query, ros::Time const& start_time, ros::Time const& end_time, bool const& reduce_overlap) : view_revision_(0), size_cache_(0), size_revision_(0), reduce_overlap_(reduce_overlap) {
 	addQuery(bag, query, start_time, end_time);
 }
 
@@ -233,14 +233,14 @@ void View::addQuery(Bag const& bag, ros::Time const& start_time, ros::Time const
     if ((bag.getMode() & bagmode::Read) != bagmode::Read)
         throw BagException("Bag not opened for reading");
 
-	boost::function<bool(ConnectionInfo const*)> query = TrueQuery();
+	std::function<bool(ConnectionInfo const*)> query = TrueQuery();
 
     queries_.push_back(new BagQuery(&bag, Query(query, start_time, end_time), bag.bag_revision_));
 
     updateQueries(queries_.back());
 }
 
-void View::addQuery(Bag const& bag, boost::function<bool(ConnectionInfo const*)> query, ros::Time const& start_time, ros::Time const& end_time) {
+void View::addQuery(Bag const& bag, std::function<bool(ConnectionInfo const*)> query, ros::Time const& start_time, ros::Time const& end_time) {
     if ((bag.getMode() & bagmode::Read) != bagmode::Read)
         throw BagException("Bag not opened for reading");
 
