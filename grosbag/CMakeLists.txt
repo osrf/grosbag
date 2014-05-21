@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(grosbag)
 find_package(catkin REQUIRED COMPONENTS grosbag_storage rosconsole roscpp topic_tools xmlrpcpp)
-find_package(Boost REQUIRED COMPONENTS regex program_options filesystem)
+find_package(Boost REQUIRED COMPONENTS program_options filesystem)
 find_package(BZip2 REQUIRED)
 
 catkin_python_setup()
@@ -10,6 +10,7 @@ catkin_python_setup()
 add_definitions(-D_FILE_OFFSET_BITS=64)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_COMPILER "clang++")
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 

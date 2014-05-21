@@ -230,7 +230,7 @@ int main(int argc, char** argv) {
         ROS_ERROR("Error reading options: %s", ex.what());
         return 1;
     }
-    catch(boost::regex_error const& ex) {
+    catch(std::regex_error const& ex) {
         ROS_ERROR("Error reading options: %s\n", ex.what());
         return 1;
     }

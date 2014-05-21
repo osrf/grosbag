@@ -47,8 +47,7 @@
 #include <vector>
 #include <condition_variable>
 #include <mutex>
-
-#include <boost/regex.hpp>
+#include <regex>
 
 #include <ros/ros.h>
 #include <ros/time.h>
@@ -98,7 +97,7 @@ struct GROSBAG_DECL RecorderOptions
     CompressionType compression;
     std::string     prefix;
     std::string     name;
-    boost::regex    exclude_regex;
+    std::regex      exclude_regex;
     uint32_t        buffer_size;
     uint32_t        chunk_size;
     uint32_t        limit;
