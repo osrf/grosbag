@@ -38,6 +38,7 @@
 #include <signal.h>
 #include <assert.h>
 #include <iomanip>
+#include <string>
 
 #include "console_bridge/console.h"
 
@@ -46,7 +47,6 @@ using std::priority_queue;
 using std::string;
 using std::vector;
 using std::multiset;
-using boost::format;
 using std::shared_ptr;
 using ros::M_string;
 using ros::Time;
@@ -98,7 +98,7 @@ void Bag::open(string const& filename, uint32_t mode) {
     else if (mode_ & bagmode::Read)
         openRead(filename);
     else
-        throw BagException((format("Unknown mode: %1%") % (int) mode).str());
+        throw BagException("Unknown mode: " + std::to_string(mode));
 
     // Determine file size
     uint64_t offset = file_.getOffset();
@@ -116,7 +116,7 @@ void Bag::openRead(string const& filename) {
     case 102: startReadingVersion102(); break;
     case 200: startReadingVersion200(); break;
     default:
-        throw BagException((format("Unsupported bag file version: %1%.%2%") % getMajorVersion() % getMinorVersion()).str());
+        throw BagException("Unsupported bag file version: " + std::to_string(getMajorVersion()) + "." + std::to_string(getMinorVersion()));
     }
 }
 
@@ -132,7 +132,7 @@ void Bag::openAppend(string const& filename) {
     readVersion();
 
     if (version_ != 200)
-        throw BagException((format("Bag file version %1%.%2% is unsupported for appending") % getMajorVersion() % getMinorVersion()).str());
+        throw BagException("Bag file version " + std::to_string(getMajorVersion()) + "." + std::to_string(getMinorVersion()));
 
     startReadingVersion200();
 
@@ -194,7 +194,7 @@ void Bag::setCompression(CompressionType compression) {
           compression == compression::BZ2 ||
           compression == compression::LZ4)) {
         throw BagException(
-            (format("Unknown compression type: %i")  % compression).str());
+            "Unknown compression type: " + std::to_string(compression));
     }
 
     compression_ = compression;
@@ -531,7 +531,7 @@ void Bag::readTopicIndexRecord102() {
     logDebug("Read INDEX_DATA: ver=%d topic=%s count=%d", index_version, topic.c_str(), count);
 
     if (index_version != 0)
-        throw BagFormatException((format("Unsupported INDEX_DATA version: %1%") % index_version).str());
+        throw BagFormatException("Unsupported INDEX_DATA version: " + std::to_string(index_version));
 
     uint32_t connection_id;
     map<string, uint32_t>::const_iterator topic_conn_id_iter = topic_connection_ids_.find(topic);
@@ -593,7 +593,7 @@ void Bag::readConnectionIndexRecord200() {
     logDebug("Read INDEX_DATA: ver=%d connection=%d count=%d", index_version, connection_id, count);
 
     if (index_version != 1)
-        throw BagFormatException((format("Unsupported INDEX_DATA version: %1%") % index_version).str());
+        throw BagFormatException("Unsupported INDEX_DATA version: " + std::to_string(index_version));
 
     uint64_t chunk_pos = curr_chunk_info_.pos;
 
@@ -780,7 +780,7 @@ void Bag::readMessageDataRecord102(uint64_t offset, ros::Header& header) const {
     while (op == OP_MSG_DEF);
 
     if (op != OP_MSG_DATA)
-        throw BagFormatException((format("Expected MSG_DATA op, got %d") % op).str());
+        throw BagFormatException("Expected MSG_DATA op, got " + std::to_string(op));
 
     record_buffer_.setSize(data_size);
     file_.read((char*) record_buffer_.getData(), data_size);
@@ -846,7 +846,7 @@ ros::Header Bag::readMessageDataHeader(IndexEntry const& index_entry) {
         readMessageDataRecord102(index_entry.chunk_pos, header);
         return header;
     default:
-        throw BagFormatException((format("Unhandled version: %1%") % version_).str());
+        throw BagFormatException("Unhandled version: " + std::to_string(version_));
     }
 }
 
@@ -865,7 +865,7 @@ uint32_t Bag::readMessageDataSize(IndexEntry const& index_entry) const {
         readMessageDataRecord102(index_entry.chunk_pos, header);
         return record_buffer_.getSize();
     default:
-        throw BagFormatException((format("Unhandled version: %1%") % version_).str());
+        throw BagFormatException("Unhandled version: " + std::to_string(version_));
     }
 }
 
@@ -917,7 +917,7 @@ void Bag::readChunkInfoRecord() {
     uint32_t chunk_info_version;
     readField(fields, VER_FIELD_NAME, true, &chunk_info_version);
     if (chunk_info_version != CHUNK_INFO_VERSION)
-        throw BagFormatException((format("Expected CHUNK_INFO version %1%, read %2%") % CHUNK_INFO_VERSION % chunk_info_version).str());
+        throw BagFormatException("Expected CHUNK_INFO version " + std::to_string(CHUNK_INFO_VERSION) + ", read " + std::to_string(chunk_info_version));
 
     // Read the chunk position, timestamp, and topic count fields
     ChunkInfo chunk_info;
@@ -1064,7 +1064,7 @@ M_string::const_iterator Bag::checkField(M_string const& fields, string const& f
             throw BagFormatException("Required '" + field + "' field missing");
     }
     else if ((fitr->second.size() < min_len) || (fitr->second.size() > max_len))
-        throw BagFormatException((format("Field '%1%' is wrong size (%2% bytes)") % field % (uint32_t) fitr->second.size()).str());
+        throw BagFormatException("Field '" + field + "' is wrong size (" + std::to_string(fitr->second.size()) + " bytes)");
 
     return fitr;
 }

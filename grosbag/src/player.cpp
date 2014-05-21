@@ -41,7 +41,6 @@
 #endif
 
 #include <algorithm>
-#include <boost/format.hpp>
 
 #include "rosgraph_msgs/Clock.h"
 
