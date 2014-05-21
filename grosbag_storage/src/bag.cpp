@@ -47,7 +47,7 @@ using std::string;
 using std::vector;
 using std::multiset;
 using boost::format;
-using boost::shared_ptr;
+using std::shared_ptr;
 using ros::M_string;
 using ros::Time;
 
@@ -725,7 +725,7 @@ void Bag::readMessageDefinitionRecord102() {
     connection_info->msg_def  = message_definition;
     connection_info->datatype = datatype;
     connection_info->md5sum   = md5sum;
-    connection_info->header = boost::shared_ptr<ros::M_string>(new ros::M_string);
+    connection_info->header = std::shared_ptr<ros::M_string>(new ros::M_string);
     (*connection_info->header)["type"]               = connection_info->datatype;
     (*connection_info->header)["md5sum"]             = connection_info->md5sum;
     (*connection_info->header)["message_definition"] = connection_info->msg_def;

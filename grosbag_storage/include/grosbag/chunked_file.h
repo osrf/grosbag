@@ -39,7 +39,7 @@
 #include <stdint.h>
 #include <string>
 #include "macros.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <bzlib.h>
 
@@ -93,10 +93,10 @@ private:
     char*       unused_;         //!< extra data read by compressed stream
     int         nUnused_;        //!< number of bytes of extra data read by compressed stream
 
-    boost::shared_ptr<StreamFactory> stream_factory_;
+    std::shared_ptr<StreamFactory> stream_factory_;
 
-    boost::shared_ptr<Stream> read_stream_;
-    boost::shared_ptr<Stream> write_stream_;
+    std::shared_ptr<Stream> read_stream_;
+    std::shared_ptr<Stream> write_stream_;
 };
 
 } // namespace grosbag

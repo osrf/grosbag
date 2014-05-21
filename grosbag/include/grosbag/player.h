@@ -185,7 +185,7 @@ private:
 
     ros::WallTime paused_time_;
 
-    std::vector<boost::shared_ptr<Bag> >  bags_;
+    std::vector<std::shared_ptr<Bag> >  bags_;
     std::map<std::string, ros::Publisher> publishers_;
 
     // Terminal

@@ -65,11 +65,11 @@ namespace grosbag {
 class GROSBAG_DECL OutgoingMessage
 {
 public:
-    OutgoingMessage(std::string const& _topic, topic_tools::ShapeShifter::ConstPtr _msg, boost::shared_ptr<ros::M_string> _connection_header, ros::Time _time);
+    OutgoingMessage(std::string const& _topic, topic_tools::ShapeShifter::ConstPtr _msg, std::shared_ptr<ros::M_string> _connection_header, ros::Time _time);
 
     std::string                         topic;
     topic_tools::ShapeShifter::ConstPtr msg;
-    boost::shared_ptr<ros::M_string>    connection_header;
+    std::shared_ptr<ros::M_string>    connection_header;
     ros::Time                           time;
 };
 
@@ -119,7 +119,7 @@ public:
 
     bool isSubscribed(std::string const& topic) const;
 
-    boost::shared_ptr<ros::Subscriber> subscribe(std::string const& topic);
+    std::shared_ptr<ros::Subscriber> subscribe(std::string const& topic);
 
     int run();
 
@@ -135,8 +135,8 @@ private:
     bool checkDisk();
 
     void snapshotTrigger(std_msgs::Empty::ConstPtr trigger);
-    //    void doQueue(topic_tools::ShapeShifter::ConstPtr msg, std::string const& topic, boost::shared_ptr<ros::Subscriber> subscriber, boost::shared_ptr<int> count);
-    void doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event, std::string const& topic, boost::shared_ptr<ros::Subscriber> subscriber, boost::shared_ptr<int> count);
+    //    void doQueue(topic_tools::ShapeShifter::ConstPtr msg, std::string const& topic, std::shared_ptr<ros::Subscriber> subscriber, std::shared_ptr<int> count);
+    void doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event, std::string const& topic, std::shared_ptr<ros::Subscriber> subscriber, std::shared_ptr<int> count);
     void doRecord();
     bool checkSize();
     bool checkDuration(const ros::Time&);

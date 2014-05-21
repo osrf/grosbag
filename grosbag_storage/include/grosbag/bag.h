@@ -143,7 +143,7 @@ public:
      */
     template<class T>
     void write(std::string const& topic, ros::Time const& time, T const& msg,
-               boost::shared_ptr<ros::M_string> connection_header = boost::shared_ptr<ros::M_string>());
+               std::shared_ptr<ros::M_string> connection_header = std::shared_ptr<ros::M_string>());
 
     //! Write a message into the bag file
     /*!
@@ -155,8 +155,8 @@ public:
      * Can throw BagIOException
      */
     template<class T>
-    void write(std::string const& topic, ros::Time const& time, boost::shared_ptr<T const> const& msg,
-               boost::shared_ptr<ros::M_string> connection_header = boost::shared_ptr<ros::M_string>());
+    void write(std::string const& topic, ros::Time const& time, std::shared_ptr<T const> const& msg,
+               std::shared_ptr<ros::M_string> connection_header = std::shared_ptr<ros::M_string>());
 
     //! Write a message into the bag file
     /*!
@@ -168,13 +168,13 @@ public:
      * Can throw BagIOException
      */
     template<class T>
-    void write(std::string const& topic, ros::Time const& time, boost::shared_ptr<T> const& msg,
-               boost::shared_ptr<ros::M_string> connection_header = boost::shared_ptr<ros::M_string>());
+    void write(std::string const& topic, ros::Time const& time, std::shared_ptr<T> const& msg,
+               std::shared_ptr<ros::M_string> connection_header = std::shared_ptr<ros::M_string>());
 
 private:
     // This helper function actually does the write with an arbitrary serializable message
     template<class T>
-    void doWrite(std::string const& topic, ros::Time const& time, T const& msg, boost::shared_ptr<ros::M_string> const& connection_header);
+    void doWrite(std::string const& topic, ros::Time const& time, T const& msg, std::shared_ptr<ros::M_string> const& connection_header);
 
     void openRead  (std::string const& filename);
     void openWrite (std::string const& filename);
@@ -183,7 +183,7 @@ private:
     void closeWrite();
 
     template<class T>
-    boost::shared_ptr<T> instantiateBuffer(IndexEntry const& index_entry) const;  //!< deserializes the message held in record_buffer_
+    std::shared_ptr<T> instantiateBuffer(IndexEntry const& index_entry) const;  //!< deserializes the message held in record_buffer_
 
     void startWriting();
     void stopWriting();
@@ -324,17 +324,17 @@ void Bag::write(std::string const& topic, ros::MessageEvent<T> const& event) {
 }
 
 template<class T>
-void Bag::write(std::string const& topic, ros::Time const& time, T const& msg, boost::shared_ptr<ros::M_string> connection_header) {
+void Bag::write(std::string const& topic, ros::Time const& time, T const& msg, std::shared_ptr<ros::M_string> connection_header) {
     doWrite(topic, time, msg, connection_header);
 }
 
 template<class T>
-void Bag::write(std::string const& topic, ros::Time const& time, boost::shared_ptr<T const> const& msg, boost::shared_ptr<ros::M_string> connection_header) {
+void Bag::write(std::string const& topic, ros::Time const& time, std::shared_ptr<T const> const& msg, std::shared_ptr<ros::M_string> connection_header) {
     doWrite(topic, time, *msg, connection_header);
 }
 
 template<class T>
-void Bag::write(std::string const& topic, ros::Time const& time, boost::shared_ptr<T> const& msg, boost::shared_ptr<ros::M_string> connection_header) {
+void Bag::write(std::string const& topic, ros::Time const& time, std::shared_ptr<T> const& msg, std::shared_ptr<ros::M_string> connection_header) {
     doWrite(topic, time, *msg, connection_header);
 }
 
@@ -381,7 +381,7 @@ void Bag::readMessageDataIntoStream(IndexEntry const& index_entry, Stream& strea
 }
 
 template<class T>
-boost::shared_ptr<T> Bag::instantiateBuffer(IndexEntry const& index_entry) const {
+std::shared_ptr<T> Bag::instantiateBuffer(IndexEntry const& index_entry) const {
     switch (version_)
     {
     case 200:
@@ -403,7 +403,7 @@ boost::shared_ptr<T> Bag::instantiateBuffer(IndexEntry const& index_entry) const
             throw BagFormatException((boost::format("Unknown connection ID: %1%") % connection_id).str());
         ConnectionInfo* connection_info = connection_iter->second;
 
-        boost::shared_ptr<T> p = boost::shared_ptr<T>(new T());
+        std::shared_ptr<T> p = std::shared_ptr<T>(new T());
 
         ros::serialization::PreDeserializeParams<T> predes_params;
         predes_params.message = p;
@@ -440,10 +440,10 @@ boost::shared_ptr<T> Bag::instantiateBuffer(IndexEntry const& index_entry) const
             throw BagFormatException((boost::format("Unknown connection ID: %1%") % connection_id).str());
         ConnectionInfo* connection_info = connection_iter->second;
 
-        boost::shared_ptr<T> p = boost::shared_ptr<T>(new T());
+        std::shared_ptr<T> p = std::shared_ptr<T>(new T());
 
         // Create a new connection header, updated with the latching and callerid values
-        boost::shared_ptr<ros::M_string> message_header(new ros::M_string);
+        std::shared_ptr<ros::M_string> message_header(new ros::M_string);
         for (ros::M_string::const_iterator i = connection_info->header->begin(); i != connection_info->header->end(); i++)
             (*message_header)[i->first] = i->second;
         (*message_header)["latching"] = latching;
@@ -466,7 +466,7 @@ boost::shared_ptr<T> Bag::instantiateBuffer(IndexEntry const& index_entry) const
 }
 
 template<class T>
-void Bag::doWrite(std::string const& topic, ros::Time const& time, T const& msg, boost::shared_ptr<ros::M_string> const& connection_header) {
+void Bag::doWrite(std::string const& topic, ros::Time const& time, T const& msg, std::shared_ptr<ros::M_string> const& connection_header) {
 
     if (time < ros::TIME_MIN)
     {
@@ -534,7 +534,7 @@ void Bag::doWrite(std::string const& topic, ros::Time const& time, T const& msg,
                 connection_info->header = connection_header;
             }
             else {
-                connection_info->header = boost::shared_ptr<ros::M_string>(new ros::M_string);
+                connection_info->header = std::shared_ptr<ros::M_string>(new ros::M_string);
                 (*connection_info->header)["type"]               = connection_info->datatype;
                 (*connection_info->header)["md5sum"]             = connection_info->md5sum;
                 (*connection_info->header)["message_definition"] = connection_info->msg_def;

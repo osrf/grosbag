@@ -54,7 +54,7 @@ struct GROSBAG_DECL ConnectionInfo
     std::string md5sum;
     std::string msg_def;
 
-    boost::shared_ptr<ros::M_string> header;
+    std::shared_ptr<ros::M_string> header;
 };
 
 struct ChunkInfo

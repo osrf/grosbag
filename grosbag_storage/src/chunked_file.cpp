@@ -55,7 +55,7 @@
 
 using std::string;
 using boost::format;
-using boost::shared_ptr;
+using std::shared_ptr;
 using ros::Exception;
 
 namespace grosbag {
@@ -67,7 +67,7 @@ ChunkedFile::ChunkedFile() :
     unused_(NULL),
     nUnused_(0)
 {
-    stream_factory_ = boost::shared_ptr<StreamFactory>(new StreamFactory(this));
+    stream_factory_ = std::shared_ptr<StreamFactory>(new StreamFactory(this));
 }
 
 ChunkedFile::~ChunkedFile() {

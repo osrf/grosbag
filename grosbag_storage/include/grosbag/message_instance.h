@@ -67,7 +67,7 @@ public:
     std::string const& getMD5Sum()            const;
     std::string const& getMessageDefinition() const;
 
-    boost::shared_ptr<ros::M_string> getConnectionHeader() const;
+    std::shared_ptr<ros::M_string> getConnectionHeader() const;
 
     std::string getCallerId() const;
     bool        isLatching()  const;
@@ -84,7 +84,7 @@ public:
      * returns NULL pointer if incompatible
      */
     template<class T>
-    boost::shared_ptr<T> instantiate() const;
+    std::shared_ptr<T> instantiate() const;
   
     //! Write serialized message contents out to a stream
     template<typename Stream>
@@ -158,9 +158,9 @@ bool MessageInstance::isType() const {
 }
 
 template<class T>
-boost::shared_ptr<T> MessageInstance::instantiate() const {
+std::shared_ptr<T> MessageInstance::instantiate() const {
     if (!isType<T>())
-        return boost::shared_ptr<T>();
+        return std::shared_ptr<T>();
 
     return bag_->instantiateBuffer<T>(index_entry_);
 }

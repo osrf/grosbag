@@ -38,8 +38,7 @@
 #include <ios>
 #include <stdint.h>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <bzlib.h>
 
@@ -102,12 +101,12 @@ class GROSBAG_DECL StreamFactory
 public:
     StreamFactory(ChunkedFile* file);
 
-    boost::shared_ptr<Stream> getStream(CompressionType type) const;
+    std::shared_ptr<Stream> getStream(CompressionType type) const;
 
 private:
-    boost::shared_ptr<Stream> uncompressed_stream_;
-    boost::shared_ptr<Stream> bz2_stream_;
-    boost::shared_ptr<Stream> lz4_stream_;
+    std::shared_ptr<Stream> uncompressed_stream_;
+    std::shared_ptr<Stream> bz2_stream_;
+    std::shared_ptr<Stream> lz4_stream_;
 };
 
 class GROSBAG_DECL UncompressedStream : public Stream

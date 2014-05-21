@@ -49,7 +49,7 @@ using std::map;
 using std::pair;
 using std::string;
 using std::vector;
-using boost::shared_ptr;
+using std::shared_ptr;
 using ros::Exception;
 
 namespace grosbag {

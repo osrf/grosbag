@@ -66,14 +66,14 @@ using std::endl;
 using std::set;
 using std::string;
 using std::vector;
-using boost::shared_ptr;
+using std::shared_ptr;
 using ros::Time;
 
 namespace grosbag {
 
 // OutgoingMessage
 
-OutgoingMessage::OutgoingMessage(string const& _topic, topic_tools::ShapeShifter::ConstPtr _msg, boost::shared_ptr<ros::M_string> _connection_header, Time _time) :
+OutgoingMessage::OutgoingMessage(string const& _topic, topic_tools::ShapeShifter::ConstPtr _msg, std::shared_ptr<ros::M_string> _connection_header, Time _time) :
     topic(_topic), msg(_msg), connection_header(_connection_header), time(_time)
 {
 }
@@ -281,7 +281,14 @@ void Recorder::doQueue(const ros::MessageEvent<topic_tools::ShapeShifter const>&
     if (options_.verbose)
         cout << "Received message on topic " << subscriber->getTopic() << endl;
 
-    OutgoingMessage out(topic, msg_event.getMessage(), msg_event.getConnectionHeaderPtr(), rectime);
+    auto boost_shared_connection_header_ptr = msg_event.getConnectionHeaderPtr();
+    std::shared_ptr<ros::M_string> connection_header_ptr(
+        boost_shared_connection_header_ptr.get(), [boost_shared_connection_header_ptr](ros::M_string*) mutable {
+            boost_shared_connection_header_ptr.reset();
+        }
+    );
+
+    OutgoingMessage out(topic, msg_event.getMessage(), connection_header_ptr, rectime);
     
     {
         boost::mutex::scoped_lock lock(queue_mutex_);

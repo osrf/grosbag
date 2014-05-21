@@ -37,7 +37,7 @@
 
 //#include <ros/ros.h>
 
-using boost::shared_ptr;
+using std::shared_ptr;
 
 namespace grosbag {
 

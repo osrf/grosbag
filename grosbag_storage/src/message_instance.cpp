@@ -31,7 +31,7 @@
 
 using std::string;
 using ros::Time;
-using boost::shared_ptr;
+using std::shared_ptr;
 
 namespace grosbag {
 
