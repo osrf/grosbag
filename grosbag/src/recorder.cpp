@@ -47,10 +47,10 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <boost/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 
@@ -169,16 +169,16 @@ int Recorder::run() {
     ros::Subscriber trigger_sub;
 
     // Spin up a thread for writing to the file
-    boost::thread record_thread;
+    std::thread record_thread;
     if (options_.snapshot)
     {
-        record_thread = boost::thread(boost::bind(&Recorder::doRecordSnapshotter, this));
+        record_thread = std::thread(boost::bind(&Recorder::doRecordSnapshotter, this));
 
         // Subscribe to the snapshot trigger
         trigger_sub = nh.subscribe<std_msgs::Empty>("snapshot_trigger", 100, boost::bind(&Recorder::snapshotTrigger, this, _1));
     }
     else
-        record_thread = boost::thread(boost::bind(&Recorder::doRecord, this));
+        record_thread = std::thread(boost::bind(&Recorder::doRecord, this));
 
 
 
