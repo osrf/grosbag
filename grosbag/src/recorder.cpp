@@ -51,7 +51,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <boost/date_time/local_time/local_time.hpp>
 
 #include <ros/ros.h>
 #include <topic_tools/shape_shifter.h>
@@ -263,12 +262,14 @@ template<class T>
 std::string Recorder::timeToStr(T ros_t)
 {
     std::stringstream msg;
-    const boost::posix_time::ptime now=
-        boost::posix_time::second_clock::local_time();
-    boost::posix_time::time_facet *const f=
-        new boost::posix_time::time_facet("%Y-%m-%d-%H-%M-%S");
-    msg.imbue(std::locale(msg.getloc(),f));
-    msg << now;
+    auto now = std::chrono::system_clock::now();
+    auto now_c = std::chrono::system_clock::to_time_t(now);
+    msg.imbue(std::locale(msg.getloc()));
+    char now_c_str[20];
+    // NOTE: std::put_time is not implemented in GNU g++4.9 or Clang 3.4 yet,
+    // use std::strftime instead for now
+    std::strftime(now_c_str, sizeof(now_c_str), "%Y-%m-%d-%H-%M-%S", std::localtime(&now_c));
+    msg << now_c_str;
     return msg.str();
 }
 
