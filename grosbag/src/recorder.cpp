@@ -171,19 +171,19 @@ int Recorder::run() {
     std::thread record_thread;
     if (options_.snapshot)
     {
-        record_thread = std::thread(boost::bind(&Recorder::doRecordSnapshotter, this));
+        record_thread = std::thread(std::bind(&Recorder::doRecordSnapshotter, this));
 
         // Subscribe to the snapshot trigger
-        trigger_sub = nh.subscribe<std_msgs::Empty>("snapshot_trigger", 100, boost::bind(&Recorder::snapshotTrigger, this, _1));
+        trigger_sub = nh.subscribe<std_msgs::Empty>("snapshot_trigger", 100, std::bind(&Recorder::snapshotTrigger, this, std::placeholders::_1));
     }
     else
-        record_thread = std::thread(boost::bind(&Recorder::doRecord, this));
+        record_thread = std::thread(std::bind(&Recorder::doRecord, this));
 
 
 
     ros::Timer check_master_timer;
     if (options_.record_all || options_.regex || (options_.node != std::string("")))
-        check_master_timer = nh.createTimer(ros::Duration(1.0), boost::bind(&Recorder::doCheckMaster, this, _1, boost::ref(nh)));
+        check_master_timer = nh.createTimer(ros::Duration(1.0), std::bind(&Recorder::doCheckMaster, this, std::placeholders::_1, std::ref(nh)));
 
     ros::MultiThreadedSpinner s(10);
     ros::spin(s);
@@ -211,7 +211,7 @@ shared_ptr<ros::Subscriber> Recorder::subscribe(string const& topic) {
     ops.datatype = ros::message_traits::datatype<topic_tools::ShapeShifter>();
     ops.helper = ros::SubscriptionCallbackHelperPtr(
         new ros::SubscriptionCallbackHelperT<const ros::MessageEvent<topic_tools::ShapeShifter const>& >(
-            boost::bind(&Recorder::doQueue, this, _1, topic, sub, count)
+            std::bind(&Recorder::doQueue, this, std::placeholders::_1, topic, sub, count)
         )
     );
     *sub = nh.subscribe(ops);
@@ -583,7 +583,7 @@ void Recorder::doTrigger() {
     ros::Publisher pub = nh.advertise<std_msgs::Empty>("snapshot_trigger", 1, true);
     pub.publish(std_msgs::Empty());
 
-    ros::Timer terminate_timer = nh.createTimer(ros::Duration(1.0), boost::bind(&ros::shutdown));
+    ros::Timer terminate_timer = nh.createTimer(ros::Duration(1.0), std::bind(&ros::shutdown));
     ros::spin();
 }
 
