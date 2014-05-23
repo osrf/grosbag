@@ -49,8 +49,6 @@
 #include <string>
 #include <thread>
 
-#include <boost/regex.hpp>
-
 #include <ros/ros.h>
 #include <topic_tools/shape_shifter.h>
 
@@ -87,8 +85,6 @@ OutgoingQueue::OutgoingQueue(string const& _filename, std::queue<OutgoingMessage
 RecorderOptions::RecorderOptions() :
     trigger(false),
     record_all(false),
-    regex(false),
-    do_exclude(false),
     quiet(false),
     append_date(true),
     snapshot(false),
@@ -96,7 +92,6 @@ RecorderOptions::RecorderOptions() :
     compression(compression::Uncompressed),
     prefix(""),
     name(""),
-    exclude_regex(),
     buffer_size(1048576 * 256),
     chunk_size(1024 * 768),
     limit(0),
@@ -147,10 +142,8 @@ int Recorder::run() {
     queue_ = new std::queue<OutgoingMessage>;
 
     // Subscribe to each topic
-    if (!options_.regex) {
-    	for(string const& topic : options_.topics)
-            subscribe(topic);
-    }
+    for(string const& topic : options_.topics)
+        subscribe(topic);
 
     if (!ros::Time::waitForValid(ros::WallDuration(2.0)))
       ROS_WARN("/use_sim_time set to true and no clock published.  Still waiting for valid time...");
@@ -180,7 +173,7 @@ int Recorder::run() {
 
 
     ros::Timer check_master_timer;
-    if (options_.record_all || options_.regex || (options_.node != std::string("")))
+    if (options_.record_all || (options_.node != std::string("")))
         check_master_timer = nh.createTimer(ros::Duration(1.0), std::bind(&Recorder::doCheckMaster, this, std::placeholders::_1, std::ref(nh)));
 
     ros::MultiThreadedSpinner s(10);
@@ -230,29 +223,13 @@ bool Recorder::shouldSubscribeToTopic(std::string const& topic, bool from_node) 
         return false;
     }
 
-    // subtract exclusion regex, if any
-    if(options_.do_exclude && boost::regex_match(topic, options_.exclude_regex)) {
-        return false;
-    }
-
     if(options_.record_all || from_node) {
         return true;
     }
     
-    if (options_.regex) {
-        // Treat the topics as regular expressions
-        for(string const& regex_str : options_.topics) {
-            boost::regex e(regex_str);
-            boost::smatch what;
-            if (boost::regex_match(topic, what, e, boost::match_extra))
-                return true;
-        }
-    }
-    else {
-        for(string const& t : options_.topics)
-            if (t == topic)
-                return true;
-    }
+    for(string const& t : options_.topics)
+        if (t == topic)
+            return true;
     
     return false;
 }

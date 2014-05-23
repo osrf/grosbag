@@ -4,7 +4,7 @@ project(grosbag_storage)
 
 find_package(console_bridge REQUIRED)
 find_package(catkin REQUIRED COMPONENTS cpp_common roscpp_serialization roscpp_traits rostime roslz4)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options regex)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options)
 find_package(BZip2 REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
