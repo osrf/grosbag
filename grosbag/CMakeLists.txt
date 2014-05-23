@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(grosbag)
 find_package(catkin REQUIRED COMPONENTS grosbag_storage rosconsole roscpp topic_tools xmlrpcpp)
-find_package(Boost REQUIRED COMPONENTS date_time regex program_options filesystem)
+find_package(Boost REQUIRED COMPONENTS regex program_options filesystem)
 find_package(BZip2 REQUIRED)
 
 catkin_python_setup()
