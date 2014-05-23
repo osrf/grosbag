@@ -50,8 +50,6 @@ grosbag::RecorderOptions parseOptions(int argc, char** argv) {
     desc.add_options()
       ("help,h", "produce help message")
       ("all,a", "record all topics")
-      ("regex,e", "match topics using regular expressions")
-      ("exclude,x", po::value<std::string>(), "exclude topics matching regular expressions")
       ("quiet,q", "suppress console output")
       ("output-prefix,o", po::value<std::string>(), "prepend PREFIX to beginning of bag name")
       ("output-name,O", po::value<std::string>(), "record bagnamed NAME.bag")
@@ -90,13 +88,6 @@ grosbag::RecorderOptions parseOptions(int argc, char** argv) {
 
     if (vm.count("all"))
       opts.record_all = true;
-    if (vm.count("regex"))
-      opts.regex = true;
-    if (vm.count("exclude"))
-    {
-      opts.do_exclude = true;
-      opts.exclude_regex = vm["exclude"].as<std::string>();
-    }
     if (vm.count("quiet"))
       opts.quiet = true;
     if (vm.count("output-prefix"))
@@ -206,15 +197,6 @@ grosbag::RecorderOptions parseOptions(int argc, char** argv) {
         opts.topics.push_back(*i);
     }
 
-
-    // check that argument combinations make sense
-    if(opts.exclude_regex.size() > 0 &&
-            !(opts.record_all || opts.regex)) {
-        fprintf(stderr, "Warning: Exclusion regex given, but no topics to subscribe to.\n"
-                "Adding implicit 'record all'.");
-        opts.record_all = true;
-    }
-
     return opts;
 }
 
@@ -228,10 +210,6 @@ int main(int argc, char** argv) {
     }
     catch (ros::Exception const& ex) {
         ROS_ERROR("Error reading options: %s", ex.what());
-        return 1;
-    }
-    catch(boost::regex_error const& ex) {
-        ROS_ERROR("Error reading options: %s\n", ex.what());
         return 1;
     }
 
