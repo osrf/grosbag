@@ -49,7 +49,6 @@
 #include <string>
 #include <thread>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
 #include <ros/ros.h>
@@ -346,7 +345,7 @@ void Recorder::updateFilenames() {
     if (options_.append_date)
         parts.push_back(timeToStr(ros::WallTime::now()));
     if (options_.split)
-        parts.push_back(boost::lexical_cast<string>(split_count_));
+        parts.push_back(std::to_string(split_count_));
 
     target_filename_ = parts[0];
     for (unsigned int i = 1; i < parts.size(); i++)
