@@ -35,12 +35,7 @@
 #include "grosbag/recorder.h"
 
 #include <sys/stat.h>
-#include <boost/filesystem.hpp>
-// Boost filesystem v3 is default in 1.46.0 and above
-// Fallback to original posix code (*nix only) if this is not true
-#if BOOST_FILESYSTEM_VERSION < 3
-  #include <sys/statvfs.h>
-#endif
+#include <sys/statvfs.h>
 #include <time.h>
 
 #include <queue>
@@ -575,7 +570,6 @@ bool Recorder::scheduledCheckDisk() {
 }
 
 bool Recorder::checkDisk() {
-#if BOOST_FILESYSTEM_VERSION < 3
     struct statvfs fiData;
     if ((statvfs(bag_.getFileName().c_str(), &fiData)) < 0)
     {
@@ -598,36 +592,6 @@ bool Recorder::checkDisk() {
     {
         writing_enabled_ = true;
     }
-#else
-    boost::filesystem::path p(boost::filesystem::system_complete(bag_.getFileName().c_str()));
-    p = p.parent_path();
-    boost::filesystem::space_info info;
-    try
-    {
-        info = boost::filesystem::space(p);
-    }
-    catch (boost::filesystem::filesystem_error &e) 
-    { 
-        ROS_WARN("Failed to check filesystem stats [%s].", e.what());
-        writing_enabled_ = false;
-        return false;
-    }
-    if ( info.available < 1073741824ull)
-    {
-        ROS_ERROR("Less than 1GB of space free on disk with %s.  Disabling recording.", bag_.getFileName().c_str());
-        writing_enabled_ = false;
-        return false;
-    }
-    else if (info.available < 5368709120ull)
-    {
-        ROS_WARN("Less than 5GB of space free on disk with %s.", bag_.getFileName().c_str());
-        writing_enabled_ = true;
-    }
-    else
-    {
-        writing_enabled_ = true;
-    }
-#endif
     return true;
 }
 
